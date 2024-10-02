@@ -1,0 +1,51 @@
+---
+title: "Week 1 Discussion"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+Load all necessary packages:
+
+```{r}
+library(here)
+library(tidyverse)
+library(stars)
+library(sf)
+library(tmap)
+```
+
+Read in the spatial objects for Easter Island:
+
+```{r}
+ei_points <- sf::read_sf(here::here("data", "easter_island", "ei_points.gpkg"))
+volcanoes <- subset(ei_points, type == "volcano")
+ei_elev <- stars::read_stars(here::here("data", "easter_island", "ei_elev.tif"))
+ei_borders <- sf::read_sf(here::here("data", "easter_island", "ei_border.gpkg"))
+ei_roads <- sf::read_sf(here::here("data", "easter_island", "ei_roads.gpkg"))
+```
+
+Create a map of Easter Island:
+
+```{r}
+tm_shape(ei_elev) + # Elevation
+  tm_raster(style = "cont", palette = "-RdYlGn", title = "Elevation (m asl)") +
+tm_graticules() +
+tm_shape(ei_borders) + # Island border
+  tm_borders() +
+tm_shape(ei_roads) + # Roads
+  tm_lines() +
+tm_shape(volcanoes) + # Volcanoes
+  tm_symbols(shape = 24, col = "black", size = "elevation", title.size = "Volcanoes (m asl)") +
+tm_layout(main.title = "Easter Island", bg.color = "lightblue") +
+tm_add_legend(type = "line", col = "black", title = "Roads") +
+tm_compass(position = c("right", "bottom")) +
+tm_scale_bar(position = c("right", "bottom"))
+
+
+# Create an interactive map:
+tmap_mode("view")
+tmap_mode("plot")
+```
+
